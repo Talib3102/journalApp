@@ -24,4 +24,5 @@ public class User {
     private String password;
     @DBRef//this annotation means ve create a reference of JournalEntry in user
     private List<JournalEntry> journalEntries=new ArrayList<>();
+    private List<String> roles;
 }
