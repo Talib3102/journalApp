@@ -1,20 +1,14 @@
 package com.talib.journalApp.controller;
 
-import com.talib.journalApp.entity.JournalEntry;
 import com.talib.journalApp.entity.User;
 import com.talib.journalApp.repository.UserRepository;
-import com.talib.journalApp.service.JournalEntryService;
 import com.talib.journalApp.service.UserService;
-import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/user")//now if i gave any endPoint to method the that endPoint is written after this endpoint basically this is use to apply mapping on whole class
@@ -39,7 +33,7 @@ public class UserController {
     public ResponseEntity<?> deleteById(){
         //when user became authenticat its credentials are store in security context folder
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        userRepository.deleteByUsername(authentication.getName());
+        userRepository.deleteByUserName(authentication.getName());
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 

@@ -5,6 +5,8 @@ import com.talib.journalApp.entity.User;
 import com.talib.journalApp.service.JournalEntryService;
 import com.talib.journalApp.service.UserService;
 import org.bson.types.ObjectId;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,12 +20,14 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/journal")//now if i gave any endPoint to method the that endPoint is written after this endpoint basically this is use to apply mapping on whole class
 
-public class journalEntryControllerV2 {
+public class JournalEntryControllerV2 {
 
     @Autowired//we inject JournalEntryService Through field
-    private JournalEntryService JournalEntryService;
+    private JournalEntryService journalEntryService;
     @Autowired
     private UserService userService;
+
+    private static final Logger logger= LoggerFactory.getLogger(JournalEntryControllerV2.class);
 
 
     @GetMapping
@@ -47,9 +51,10 @@ public class journalEntryControllerV2 {
             //when user became authenticat its credentials are store in security context folder how we fetch the data from security context
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             String userName = authentication.getName();
-            JournalEntryService.saveEntry(myEntry,userName);
+            journalEntryService.saveEntry(myEntry,userName);
             return new ResponseEntity<>(myEntry, HttpStatus.CREATED);
         } catch (Exception e) {
+            e.printStackTrace();
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 
@@ -65,7 +70,7 @@ public class journalEntryControllerV2 {
         User user = userService.findByUsername(userName);
         List<JournalEntry> collect = user.getJournalEntries().stream().filter(x -> x.getId().equals(myId)).collect(Collectors.toList());
         if (!collect.isEmpty()){
-            Optional<JournalEntry> journalEntry = JournalEntryService.findById(myId);
+            Optional<JournalEntry> journalEntry = journalEntryService.findById(myId);
             if (journalEntry.isPresent()) {
                 return new ResponseEntity<>(journalEntry.get(), HttpStatus.OK);
             }
@@ -78,7 +83,7 @@ public class journalEntryControllerV2 {
     public ResponseEntity<?> deleteJournalEntryById(@PathVariable ObjectId myId) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String userName = authentication.getName();
-        boolean removed = JournalEntryService.deleteById(myId, userName);
+        boolean removed = journalEntryService.deleteById(myId, userName);
         if (removed){
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }else {
@@ -93,12 +98,12 @@ public class journalEntryControllerV2 {
         User user = userService.findByUsername(userName);
         List<JournalEntry> collect = user.getJournalEntries().stream().filter(x -> x.getId().equals(myId)).collect(Collectors.toList());
         if (!collect.isEmpty()){
-            Optional<JournalEntry> journalEntry = JournalEntryService.findById(myId);
+            Optional<JournalEntry> journalEntry = journalEntryService.findById(myId);
             if (journalEntry.isPresent()) {
                 JournalEntry old = journalEntry.get();
                 old.setTitle(newEntry.getTitle() != null && !newEntry.getTitle().equals("") ? newEntry.getTitle(): old.getTitle());
                 old.setContent(newEntry.getContent() != null && !newEntry.equals("") ? newEntry.getContent() : old.getContent());
-                JournalEntryService.saveEntry(old);
+                journalEntryService.saveEntry(old);
                 return new ResponseEntity<>(old,HttpStatus.OK);
 
             }

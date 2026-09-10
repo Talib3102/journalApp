@@ -26,8 +26,8 @@ public class PublickController {
         //userService.saveEntry(user);
         userService.saveNewUser(user);
     }
-    @GetMapping
-    public List<User> getAllUser(){
-        return userService.getAll();
-    }
+//    @GetMapping
+//    public List<User> getAllUser(){
+//        return userService.getAll();
+//    }
 }
