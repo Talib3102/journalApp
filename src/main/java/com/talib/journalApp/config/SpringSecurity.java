@@ -33,7 +33,7 @@ public class SpringSecurity extends WebSecurityConfigurerAdapter {
                 .and()
                 .httpBasic();
 //                .formLogin();//This enable form based authentication
-      //  http.csrf().ignoringAntMatchers("/public/");
+        http.csrf().disable();
     }
 
 

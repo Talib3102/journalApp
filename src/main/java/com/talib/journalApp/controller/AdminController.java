@@ -1,5 +1,6 @@
 package com.talib.journalApp.controller;
 
+import com.talib.journalApp.cache.AppCache;
 import com.talib.journalApp.entity.User;
 import com.talib.journalApp.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +15,8 @@ import java.util.List;
 public class AdminController {
     @Autowired
     private UserService userService;
+    @Autowired
+    private AppCache appCache;
 
 
     
@@ -28,5 +31,10 @@ public class AdminController {
     @PostMapping("/create-admin-user")
     public void createUser(@RequestBody User user) {
         userService.saveAdmin(user);
+    }
+
+    @GetMapping("clear-app-cache")
+    public void clearAppCache(){
+        appCache.init();//to initialize old api key and avoid duplication of key
     }
 }

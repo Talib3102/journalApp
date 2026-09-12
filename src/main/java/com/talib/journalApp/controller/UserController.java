@@ -1,8 +1,10 @@
 package com.talib.journalApp.controller;
 
+import com.talib.journalApp.api.response.WeatherResponse;
 import com.talib.journalApp.entity.User;
 import com.talib.journalApp.repository.UserRepository;
 import com.talib.journalApp.service.UserService;
+import com.talib.journalApp.service.WeatherService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +20,8 @@ public class UserController {
     private UserService userService;
     @Autowired//Dependency Inject Through Field
     private UserRepository userRepository;
+    @Autowired
+    private WeatherService weatherService;
 
     @PutMapping
     public ResponseEntity<?> updateUser(@RequestBody User user){
@@ -25,8 +29,7 @@ public class UserController {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String userName = authentication.getName();
         User userInDb = userService.findByUsername(userName);
-            //userService.saveEntry(userInDb);
-            userService.saveNewUser(userInDb);
+        userService.saveNewUser(userInDb);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
     @DeleteMapping
@@ -35,6 +38,18 @@ public class UserController {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         userRepository.deleteByUserName(authentication.getName());
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    @GetMapping
+    public ResponseEntity<?> greeting(){
+        //when user became authenticat its credentials are store in security context folder
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        WeatherResponse weatherResponse = weatherService.getWeather("Mumbai");
+        String greeting="";
+        if(weatherResponse != null){
+            greeting=", Weather feels like "+ weatherResponse.getMain().getFeelsLike();
+        }
+        return new ResponseEntity<>("Hi "+authentication.getName()+greeting,HttpStatus.OK);
     }
 
 
