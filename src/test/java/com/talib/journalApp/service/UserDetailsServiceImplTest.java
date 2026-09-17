@@ -15,10 +15,10 @@ import java.util.ArrayList;
 
 import static org.mockito.Mockito.*;
 
-public class CustomUserDetailsServiceImplTest {
+public class UserDetailsServiceImplTest {
     //@Autowired instead of autoeired we sue @InjectMocks
     @InjectMocks
-    private CustomUserDetailsServiceImpl customUserDetailsService;
+    private UserDetailsServiceImpl customUserDetailsService;
 
 
     @Mock

@@ -1,5 +1,6 @@
 package com.talib.journalApp.entity;
 
+import com.talib.journalApp.enums.Sentiment;
 import lombok.*;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
@@ -20,5 +21,6 @@ public class JournalEntry {
     @NonNull
     private String title;
     private String content;
+    private Sentiment sentiment;
 
 }
