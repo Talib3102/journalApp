@@ -4,6 +4,8 @@ import com.talib.journalApp.entity.JournalEntry;
 import com.talib.journalApp.entity.User;
 import com.talib.journalApp.service.JournalEntryService;
 import com.talib.journalApp.service.UserService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,7 +21,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/journal")//now if i gave any endPoint to method the that endPoint is written after this endpoint basically this is use to apply mapping on whole class
-
+@Tag(name="Journal APIs",description = "Creat, Read, Update & Delete JournalEntries")
 public class JournalEntryControllerV2 {
 
     @Autowired//we inject JournalEntryService Through field
@@ -31,6 +33,7 @@ public class JournalEntryControllerV2 {
 
 
     @GetMapping
+    @Operation(summary = "Get all Journal entries of a user")
     public ResponseEntity<?> getAllJournalEntriesOfUser() {
         //when user became authenticat its credentials are store in security context folder how we fetch the data from security context
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -44,6 +47,7 @@ public class JournalEntryControllerV2 {
     }
 
     @PostMapping
+    @Operation(summary = "Create Journal entries of a user")
     public ResponseEntity<JournalEntry>/*JournalEntry*/ createEntry(@RequestBody JournalEntry myEntry) {
 
         //because we return ResponseEntity so we can replace JournalEntry to ResponseEntity
@@ -60,17 +64,19 @@ public class JournalEntryControllerV2 {
 
     }
 
-    @GetMapping("id/{myId}"/*this is varable*/)
+    @GetMapping("id/{myId}"/*this is varbale*/)
+    @Operation(summary = "Get  Jernal entries of a user by id")
 //in this GET API we try ro get Entry of user by specific id number rather than getting all user data
-    public ResponseEntity<JournalEntry>/*JournalEntry*/ getJournalEntryById(@PathVariable ObjectId myId) {//@PathhVariable is use to get data through varable name like if we send request like http://localhost:8080/journal/id/vipul its called path variable
+    public ResponseEntity<JournalEntry>/*JournalEntry*/ getJournalEntryById(@PathVariable String myId) {//@PathhVariable is use to get data through varable name like if we send request like http://localhost:8080/journal/id/vipul its called path variable
         //because it use optional we cannot directly return it
         //because we return ResponseEntity so we can replace JournalEntry to ResponseEntity
+        ObjectId objectId= new ObjectId(myId);
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String userName = authentication.getName();
         User user = userService.findByUsername(userName);
-        List<JournalEntry> collect = user.getJournalEntries().stream().filter(x -> x.getId().equals(myId)).collect(Collectors.toList());
+        List<JournalEntry> collect = user.getJournalEntries().stream().filter(x -> x.getId().equals(objectId)).collect(Collectors.toList());
         if (!collect.isEmpty()){
-            Optional<JournalEntry> journalEntry = journalEntryService.findById(myId);
+            Optional<JournalEntry> journalEntry = journalEntryService.findById(objectId);
             if (journalEntry.isPresent()) {
                 return new ResponseEntity<>(journalEntry.get(), HttpStatus.OK);
             }
@@ -79,6 +85,7 @@ public class JournalEntryControllerV2 {
     }
 
     @DeleteMapping("id/{myId}")
+    @Operation(summary = "Delete  Jernal entries of a user By ID")
     //The meaning of ? mark is wild cart pattern its not necessary that alway we have to give an entity class we can return any other class object through ResponseEntity
     public ResponseEntity<?> deleteJournalEntryById(@PathVariable ObjectId myId) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -92,6 +99,7 @@ public class JournalEntryControllerV2 {
     }
 
     @PutMapping("/id/{myId}")
+    @Operation(summary = "Edit Jernal entries of a user By ID")
     public ResponseEntity<?> putJournalEntry(@PathVariable ObjectId myId,@RequestBody JournalEntry newEntry){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String userName = authentication.getName();
